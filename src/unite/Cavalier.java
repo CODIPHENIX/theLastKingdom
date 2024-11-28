@@ -3,8 +3,11 @@ package unite;
 import enemy.TypeEnemy;
 
 public class Cavalier extends Unite{
-    public Cavalier(String nom, int pv,int attaque,int defence,int coutAchat){
-        super("Cavalier",TypeUniteJ.CAVALIER,400,50,40,200);
+    public Cavalier(){
+        super("Cavalier",TypeUniteJ.CAVALIER,400,50,40);
+    }
+    public static int getCoutAchet(){
+        return 200;
     }
     public String toString() {
         return null;

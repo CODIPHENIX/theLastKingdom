@@ -3,8 +3,11 @@ package unite;
 import enemy.TypeEnemy;
 
 public class Archer extends Unite{
-    public Archer(String nom, int pv,int attaque,int defence,int coutAchat){
-        super("Archer",TypeUniteJ.ARCHER,80,40,20,100);
+    public Archer(){
+        super("Archer",TypeUniteJ.ARCHER,80,40,20);
+    }
+    public static int getCoutAchet(){
+        return 100;
     }
     public String toString() {
         return null;

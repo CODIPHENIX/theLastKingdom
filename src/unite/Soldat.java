@@ -4,8 +4,11 @@ import enemy.TypeEnemy;
 
 public class Soldat extends Unite{
 
-    public Soldat(String nom, int pv,int attaque,int defence,int coutAchat){
-    super("Soldat",TypeUniteJ.SOLDAT,100,25,20,50);
+    public Soldat(){
+    super("Soldat",TypeUniteJ.SOLDAT,100,25,20);
+    }
+    public static int getCoutAchet(){
+        return 50;
     }
 
 

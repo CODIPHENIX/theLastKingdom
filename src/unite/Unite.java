@@ -1,5 +1,6 @@
 package unite;
 
+import application.Jeu;
 import enemy.TypeEnemy;
 
 public abstract class Unite {
@@ -17,13 +18,17 @@ public abstract class Unite {
           this.pv = pv;
           this.attaque = attaque;
           this.defence = defence;
+          this.typeEnemy = typeEnemy;
     }
-     public Unite( String nom,TypeUniteJ typeUniteJ, int pv,int attaque,int defence,int coutAchat){
+    public Unite(TypeUniteJ typeUniteJ){
+        this.typeUniteJ = typeUniteJ;
+    }
+     public Unite( String nom,TypeUniteJ typeUniteJ, int pv,int attaque,int defence){
           this.nom = nom;
           this.pv = pv;
           this.attaque = attaque;
           this.defence = defence;
-          this.coutAchat = coutAchat;
+         this.typeUniteJ = typeUniteJ;
      }
 
      public String getNom(){return nom;}
@@ -48,5 +53,27 @@ public abstract class Unite {
     public void degatRecu(int degat){
         int degatPV=this.getPv()-degat;
         this.setPv(Math.max(degatPV,0));
+    }
+    public Unite acheteUniter(int argent,TypeUniteJ choix,Jeu jeu ) {
+
+        int cout = switch (choix) {
+            case SOLDAT -> Soldat.getCoutAchet();
+            case ARCHER -> Archer.getCoutAchet();
+            case CAVALIER -> Cavalier.getCoutAchet();
+        };
+        if (argent >= cout) {
+            int achetU = argent - this.coutAchat;
+            jeu.setArgent(achetU);
+        } else {
+            System.out.println("Vous n'avez pas assez de ressources pour acheter cette unité.");
+            return null;
+        }
+
+        return switch (choix) {
+            case SOLDAT -> new Soldat();
+            case ARCHER -> new Archer();
+            case CAVALIER -> new Cavalier();
+        };
+
     }
 }
