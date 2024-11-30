@@ -10,6 +10,8 @@ public abstract class Unite {
      private int defence;
      private int coutAchat;
 
+     Jeu jeu = new Jeu();
+
      private TypeUniteJ typeUniteJ;
      private TypeEnemy typeEnemy;
      public Unite(){}
@@ -54,27 +56,5 @@ public abstract class Unite {
         int degatPV=this.getPv()-degat;
         this.setPv(Math.max(degatPV,0));
     }
-    public Unite acheteUniter(int argent,TypeUniteJ choix,Jeu jeu ) {
 
-        int cout = switch (choix) {
-            case SOLDAT -> Soldat.getCoutAchet();
-            case ARCHER -> Archer.getCoutAchet();
-            case CAVALIER -> Cavalier.getCoutAchet();
-        };
-        if (argent >= cout) {
-            int achetU = argent - this.coutAchat;
-            jeu.setArgent(achetU);
-        } else {
-            System.out.println("Vous n'avez pas assez de ressources pour acheter cette unité.");
-            return null;
-        }
-
-        return switch (choix) {
-            case SOLDAT -> new Soldat();
-            case ARCHER -> new Archer();
-            case CAVALIER -> new Cavalier();
-        };
-
-
-    }
 }
