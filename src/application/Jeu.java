@@ -3,21 +3,20 @@ package application;
 import enemy.EnemyBase;
 import enemy.EnemyBoss;
 import enemy.EnemyIntermedier;
-import unite.Archer;
-import unite.Cavalier;
-import unite.Soldat;
-import unite.Unite;
+import unite.*;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.lang.runtime.SwitchBootstraps;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
+import java.util.Scanner;
 
 public class Jeu {
-    int argent;
+    int argent=200;
     ArrayList<Unite> armee;
     ArrayList<Unite> ennemis;
-
     int tour;
 
     public Jeu(){
@@ -107,5 +106,63 @@ public class Jeu {
                 "boss" +" "+ NumCavalier+"\n" +
                 "------------------------\n" );*/
     }
+    public  Unite acheteUniter(int argent,TypeUniteJ choix ) {
+
+        int cout = switch (choix) {
+            case SOLDAT -> Soldat.getCoutAchet();
+            case ARCHER -> Archer.getCoutAchet();
+            case CAVALIER -> Cavalier.getCoutAchet();
+        };
+        if (argent >= cout) {
+            int achatU = argent - cout;
+            setArgent(achatU);
+        } else {
+            System.out.println("Vous n'avez pas assez de ressources pour acheter cette unité.");
+            return null;
+        }
+        switch (choix) {
+            case SOLDAT -> System.out.println("Vous avez bien acheté une unité SOLDAT.");
+            case ARCHER -> System.out.println("Vous avez bien acheté une unité ARCHER.");
+            case CAVALIER -> System.out.println("Vous avez bien acheté une unité CAVALIER.");
+        }
+        return switch (choix) {
+            case SOLDAT -> new Soldat();
+            case ARCHER -> new Archer();
+            case CAVALIER -> new Cavalier();
+        };
+
+
+
+    }
+    public void acheterUnites(BufferedReader scanner){
+
+        int type=0;
+        do {
+            System.out.println("----------------------------------");
+            System.out.println("Quel type Unite voulez vouz acheter?");
+            System.out.println(STR."1.SOLDAT-\{Soldat.getCoutAchet()}\n2.ARCHER-\{Archer.getCoutAchet()}\n3.CAVALIER-\{Cavalier.getCoutAchet()}");
+            System.out.println("4.retouner au menu principal");
+            System.out.println("----------------------------------");
+            System.out.println("Veillez choisir une option.");
+            System.out.println(STR."ARGENT: \{argent}");
+            try {
+                type = Integer.parseInt(scanner.readLine());
+
+                    switch (type){
+                        case 1-> armee.add(acheteUniter(argent, TypeUniteJ.SOLDAT));
+
+                        case 2-> armee.add(acheteUniter(argent, TypeUniteJ.ARCHER));
+
+                        case 3-> armee.add(acheteUniter(argent, TypeUniteJ.CAVALIER));
+
+                        case 4 -> {}
+                    }
+
+            } catch (Exception e) {
+                System.out.println("choix non valide.");
+            }
+        }while (type!=4);
+    }
+
 
 }
