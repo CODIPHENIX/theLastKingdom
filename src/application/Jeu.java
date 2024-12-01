@@ -6,15 +6,13 @@ import enemy.EnemyIntermedier;
 import unite.*;
 
 import java.io.BufferedReader;
-import java.io.IOException;
-import java.lang.runtime.SwitchBootstraps;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Random;
-import java.util.Scanner;
+
 
 public class Jeu {
-    int argent=200;
+    int argent=500;
     ArrayList<Unite> armee;
     ArrayList<Unite> ennemis;
     int tour;
@@ -63,10 +61,17 @@ public class Jeu {
                     "------------------------\n" );
 
         }
-    public void genererEnnemis(int tour){
+    public void genererEnnemis(int tour,Difficulter NiveauDifficulter){
 
         ennemis.clear();
-        int numEnemy = 3 + tour;
+        int numEnemy=0;
+
+        switch (NiveauDifficulter) {
+            case FACILE -> numEnemy = 2 + tour;
+            case NORMAL-> numEnemy = 4 + tour;
+            case DIFFICILE -> numEnemy = 6 + tour;
+        };
+
         Random random = new Random();
         int type;
 
@@ -107,7 +112,6 @@ public class Jeu {
                 "------------------------\n" );*/
     }
     public  Unite acheteUniter(int argent,TypeUniteJ choix ) {
-
         int cout = switch (choix) {
             case SOLDAT -> Soldat.getCoutAchet();
             case ARCHER -> Archer.getCoutAchet();
@@ -130,21 +134,12 @@ public class Jeu {
             case ARCHER -> new Archer();
             case CAVALIER -> new Cavalier();
         };
-
-
-
     }
     public void acheterUnites(BufferedReader scanner){
 
         int type=0;
         do {
-            System.out.println("----------------------------------");
-            System.out.println("Quel type Unite voulez vouz acheter?");
-            System.out.println(STR."1.SOLDAT-\{Soldat.getCoutAchet()}\n2.ARCHER-\{Archer.getCoutAchet()}\n3.CAVALIER-\{Cavalier.getCoutAchet()}");
-            System.out.println("4.retouner au menu principal");
-            System.out.println("----------------------------------");
-            System.out.println("Veillez choisir une option.");
-            System.out.println(STR."ARGENT: \{argent}");
+            menuAchatUniter();
             try {
                 type = Integer.parseInt(scanner.readLine());
 
@@ -155,14 +150,120 @@ public class Jeu {
 
                         case 3-> armee.add(acheteUniter(argent, TypeUniteJ.CAVALIER));
 
-                        case 4 -> {}
+                        case 4-> attaquer();
+                        case 5-> defendre();
+
                     }
 
             } catch (Exception e) {
                 System.out.println("choix non valide.");
             }
-        }while (type!=4);
+        }while (type!=5 && type!=4);
     }
+    public void attaquer(){
+
+        System.out.println("LA BATAILLE COMMENCE......");
+        System.out.println("VOTRE ARMEE COMMENCE L'ATTAQUE...");
+
+        do {
+            ArrayList<Unite> armeeMort=new ArrayList<>();
+            ArrayList<Unite> ennemisMort=new ArrayList<>();
+
+            for (Unite unite : armee) {
+                for (Unite enemy : ennemis) {
+
+                    if (unite.getPv() > 0 && enemy.getPv() > 0) {
+                            int degatSurEnemy = unite.degatCalculEnemy(unite);
+                            enemy.degatRecu(degatSurEnemy);
+                            int degatSurJouer = enemy.degatCalculJouer(enemy);
+                            unite.degatRecu(degatSurJouer);
+
+                        if (unite.isDeath(unite.getPv())) {
+                            armeeMort.add(unite);
+                            System.out.println(STR."\{enemy.getNom()} : \{FunMessage.UniteTuer()}");
+                        }
+                        if (enemy.isDeath(enemy.getPv())) {
+                            ennemisMort.add(enemy);
+                            System.out.println(STR."\{unite.getNom()} : \{FunMessage.enemyTuer()}");
+                            argent+=50;
+                        }
+                    }
+
+                }
+            }
+            armee.removeAll(armeeMort);
+            ennemis.removeAll(ennemisMort);
+        }while (!armee.isEmpty() && !ennemis.isEmpty());
+        whoWon();
+
+    }
+    public void defendre(){
+
+        System.out.println("LA BATAILLE COMMENCE......");
+        System.out.println("L'ENEMIE ATTAQUE...");
+
+        do {
+            ArrayList<Unite> armeeMort=new ArrayList<>();
+            ArrayList<Unite> ennemisMort=new ArrayList<>();
+
+            for (Unite unite : armee) {
+                for (Unite enemy : ennemis) {
+
+                    if (unite.getPv() > 0 && enemy.getPv() > 0) {
+                        int degatSurEnemy = unite.degatCalculEnemy(unite);
+                        int DSE = (int) (degatSurEnemy * 0.85);
+                        enemy.degatRecu(DSE);
+                        int degatSurJouer = enemy.degatCalculJouer(enemy);
+                        int DSJ = (int) (degatSurJouer * 0.75);
+                        unite.degatRecu(DSJ);
+
+                        if (unite.isDeath(unite.getPv())) {
+                            armeeMort.add(unite);
+                            System.out.println(STR."\{enemy.getNom()} : \{FunMessage.UniteTuer()}");
+                        }
+                        if (enemy.isDeath(enemy.getPv())) {
+                            ennemisMort.add(enemy);
+                            System.out.println(STR."\{unite.getNom()} : \{FunMessage.enemyTuer()}");
+                            argent+=50;
+                        }
+                    }
+
+                }
+            }
+            armee.removeAll(armeeMort);
+            ennemis.removeAll(ennemisMort);
+        }while (!armee.isEmpty() && !ennemis.isEmpty());
+        whoWon();
+
+    }
+
+    public void whoWon(){
+//        determine qui a garnier
+        System.out.println("----------------------------------");
+        if(ennemis.isEmpty() && armee.isEmpty()){
+            System.out.println("🤝 Match nul ! Les deux armées sont tombées au combat.");
+        }else if(ennemis.isEmpty()){
+            System.out.println(STR."\{FunMessage.victoire()}");
+            System.out.println(STR."ils vous reste \{armee.size()}");
+            System.out.println(STR."ARGENT: \{argent}");
+        } else {
+            System.out.println(STR."\{FunMessage.defaite()}");
+            System.out.println(STR."ARGENT: \{argent}");
+        }
+    }
+
+    public void menuAchatUniter(){
+        System.out.println("----------------------------------");
+        System.out.println("Quel type Unite voulez vouz acheter?");
+        System.out.println(STR."1.SOLDAT-\{Soldat.getCoutAchet()}\n2.ARCHER-\{Archer.getCoutAchet()}\n3.CAVALIER-\{Cavalier.getCoutAchet()}");
+        System.out.println("4.Lancer l'attaque");
+        System.out.println("5.se defendre");
+//        System.out.println("5.retouner au menu principal");
+        System.out.println("----------------------------------");
+        System.out.println("Veillez choisir une option.");
+        System.out.println(STR."ARGENT: \{argent}");
+    }
+
 
 
 }
