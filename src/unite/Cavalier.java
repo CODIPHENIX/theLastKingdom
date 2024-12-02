@@ -1,6 +1,5 @@
 package unite;
 
-import enemy.TypeEnemy;
 
 public class Cavalier extends Unite{
     public Cavalier(){

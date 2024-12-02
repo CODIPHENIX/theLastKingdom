@@ -1,6 +1,5 @@
 package enemy;
 
-import unite.TypeUniteJ;
 import unite.Unite;
 
 public class EnemyIntermedier extends Unite {
@@ -10,9 +9,11 @@ public class EnemyIntermedier extends Unite {
             super("Enemy Intermedier",TypeEnemy.ENEMYINTERMEDIER,120,40,25);
         }
         @Override
-        public String toString() {
-            return null;
-        }
+public String toString() {
+    return String.format("%s [Type: %s, PV: %d, Attaque: %d, Défense: %d]",
+            getNom(), getTypeEnemy(), getPv(), getAttaque(), getDefence());
+}
+
 
 
 

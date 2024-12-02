@@ -1,6 +1,5 @@
 package enemy;
 
-import unite.TypeUniteJ;
 import unite.Unite;
 
 public class EnemyBoss extends Unite {
@@ -10,7 +9,9 @@ public class EnemyBoss extends Unite {
     }
     @Override
     public String toString() {
-        return null;
+        return String.format("%s [Type: %s, PV: %d, Attaque: %d, Défense: %d]",
+                getNom(), getTypeEnemy(), getPv(), getAttaque(), getDefence());
     }
+    
 
 }
