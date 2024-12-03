@@ -13,10 +13,12 @@ import java.util.Random;
 
 
 public class Jeu {
-    int argent=500;
+    int argent=1000;
     ArrayList<Unite> armee;
     ArrayList<Unite> ennemis;
     int tour;
+    int score;
+
 
     public Jeu(){
         armee = new ArrayList<>();
@@ -30,13 +32,20 @@ public class Jeu {
     public void setArgent(int argent){
         this.argent=argent;
     }
+    public int getScore(){
+        return argent;
+    }
+    public void setScore(int score){
+        this.score=score;
+    }
 
     
     public void demarrer() {
+        int currentScore = 0;
         BufferedReader scanner = new BufferedReader(new InputStreamReader(System.in));
         boolean jeuEnCours = true;
-        int choix = 0;
-        Difficulter niveauDifficulte = Difficulter.NORMAL; 
+        int choix ;
+        Difficulter niveauDifficulte = Difficulter.NORMAL;
     
         System.out.println("Bienvenue dans 'THE LAST KINGDOM' !");
         System.out.println("Choisissez le niveau de difficulté :");
@@ -54,10 +63,12 @@ public class Jeu {
             System.out.println("Entrée non valide, niveau par défaut : NORMAL.");
         }
     
-        System.out.println(String.format("Vous commencez avec %d d'argent.", argent));
+        System.out.printf("Vous commencez avec %d Piece.%n", argent);
     
         
         while (jeuEnCours) {
+            currentScore = meilleurScore(currentScore);
+            score = 0;
             System.out.println("\n--- TOUR " + (tour + 1) + " ---");
             afficherArmee();
     
@@ -81,15 +92,18 @@ public class Jeu {
             } catch (Exception e) {
                 System.out.println("Entrée non valide, veuillez réessayer.");
             }
-    
-            if (armee.isEmpty() || ennemis.isEmpty()) {
-                jeuEnCours = false;
-                whoWon(); 
+            int maxScore =meilleurScore(currentScore);
+            System.out.printf("score de la partie: %d%n",score);
+            System.out.printf("Meilleur Score Ever: %d%n",meilleurScore(currentScore));
+            int currentTour = tour;
+
+            tour++;
+//            le jouer passe ou prochain tour que si il gagne;
+            if(armee.isEmpty()){
+                tour=currentTour;
             }
-    
-            tour++; 
+
         }
-    
         System.out.println("Fin de la partie.");
     }
     
@@ -97,31 +111,34 @@ public class Jeu {
 
             if (armee.isEmpty()){
                 System.out.println("Vous n'avez aucune unite");
-            }
-            int NumSoldat =0;
-            int NumArcher =0;
-            int NumCavalier =0;
+            }else{
 
-            for(Unite unite : armee){
-                if(unite instanceof Soldat){
-                    NumSoldat++;
-                }
-                else if(unite instanceof Archer){
-                    NumArcher++;
-                }
-               else if(unite instanceof Cavalier){
-                    NumCavalier++;
-                }
-            }
+                System.out.println("Vous avez "+ armee.size() + " Unite\n" );
+                checkUniter(armee);
 
-            System.out.println("Vous avez "+ armee.size() + " Unite\n" +
-                    "------------------------\n" +
-                    "SOLDAT" +" "+ NumSoldat+"\n" +
-                    "ARCHER" +" "+ NumArcher+"\n"+
-                    "CAVALIER" +" "+ NumCavalier+"\n" +
-                    "------------------------\n" );
+            }
 
         }
+
+    public void checkUniter(ArrayList<Unite> armee) {
+        int NumSoldat = 0;
+        int NumArcher = 0;
+        int NumCavalier = 0;
+
+        for (Unite unite : armee) {
+            if (unite instanceof Soldat) {
+                NumSoldat++;
+            } else if (unite instanceof Archer) {
+                NumArcher++;
+            } else if (unite instanceof Cavalier) {
+                NumCavalier++;
+            }
+        }
+
+        System.out.println("Nombre de Soldats : " + NumSoldat);
+        System.out.println("Nombre d'Archers : " + NumArcher);
+        System.out.println("Nombre de Cavaliers : " + NumCavalier);
+    }
     public void genererEnnemis(int tour,Difficulter NiveauDifficulter){
 
         ennemis.clear();
@@ -149,7 +166,7 @@ public class Jeu {
             ennemis.add(new EnemyBoss());
         }
 
-        System.out.println(String.format("Une vague de %d ennemis arrive...", numEnemy));
+        System.out.printf("Une vague de %d ennemis arrive...%n", numEnemy);
         /*       int NumSoldat=0;
         int NumArcher=0;
         int NumCavalier=0;
@@ -184,9 +201,9 @@ public class Jeu {
         }
         setArgent(argent - cout);
         return switch (choix) {
-        case SOLDAT -> new Soldat();
-        case ARCHER -> new Archer();
-        case CAVALIER -> new Cavalier();
+            case SOLDAT -> new Soldat();
+            case ARCHER -> new Archer();
+            case CAVALIER -> new Cavalier();
     };
     }
     public void acheterUnites(BufferedReader scanner){
@@ -203,16 +220,17 @@ public class Jeu {
                     case 2-> armee.add(acheteUniter(argent, TypeUniteJ.ARCHER));
 
                     case 3-> armee.add(acheteUniter(argent, TypeUniteJ.CAVALIER));
+                    case 4-> afficherArmee();
 
-                    case 4-> attaquer();
-                    case 5-> defendre();
+                    case 5-> attaquer();
+                    case 6-> defendre();
 
                 }
 
             } catch (Exception e) {
                 System.out.println("choix non valide.");
             }
-        }while (type!=5 && type!=4);
+        }while (type!=5 && type!=6);
     }
 
     public void attaquer(){
@@ -239,13 +257,14 @@ public class Jeu {
                         }
                         if (enemy.isDeath(enemy.getPv())) {
                             ennemisMort.add(enemy);
-                            System.out.println(enemy.getNom() + " : " + FunMessage.UniteTuer());
+                            System.out.println(unite.getNom() + " : " + FunMessage.enemyTuer());
                             argent+=50;
                         }
                     }
 
                 }
             }
+            calculScore(ennemisMort,armeeMort);
             armee.removeAll(armeeMort);
             ennemis.removeAll(ennemisMort);
         }while (!armee.isEmpty() && !ennemis.isEmpty());
@@ -278,13 +297,14 @@ public class Jeu {
                         }
                         if (enemy.isDeath(enemy.getPv())) {
                             ennemisMort.add(enemy);
-                            System.out.println(enemy.getNom() + " : " + FunMessage.UniteTuer());
+                            System.out.println(unite.getNom() + " : " + FunMessage.enemyTuer());
                             argent+=50;
                         }
                     }
 
                 }
             }
+            calculScore(ennemisMort,armeeMort);
             armee.removeAll(armeeMort);
             ennemis.removeAll(ennemisMort);
         }while (!armee.isEmpty() && !ennemis.isEmpty());
@@ -297,13 +317,18 @@ public class Jeu {
         System.out.println("----------------------------------");
         if(ennemis.isEmpty() && armee.isEmpty()){
             System.out.println("🤝 Match nul ! Les deux armées sont tombées au combat.");
+
+
         }else if(ennemis.isEmpty()){
+            System.out.println("----------VICTOIRE--------------");
             System.out.println(FunMessage.victoire());
             System.out.println("Il vous reste " + armee.size() + " unités.");
-            System.out.println(String.format("ARGENT: %d", argent));
+            argent+=50;
+            System.out.printf("Piece: %d%n", argent);
         } else {
-            System.out.println(FunMessage.victoire());
-            System.out.println(String.format("ARGENT: %d", argent));
+            System.out.println("----------GAME OVER--------------");
+            System.out.println(FunMessage.defaite());
+            System.out.printf("Piece: %d%n", argent);
         }
     }
 
@@ -311,14 +336,40 @@ public class Jeu {
         System.out.println("----------------------------------");
         System.out.println("Quel type Unite voulez vouz acheter?");
         System.out.println("1. SOLDAT - " + Soldat.getCoutAchet());
-        System.out.println("4.Lancer l'attaque");
-        System.out.println("5.se defendre");
+        System.out.println("2. ARCHER - " + Archer.getCoutAchet());
+        System.out.println("3. CAVALIER - " + Cavalier.getCoutAchet());
+        System.out.println("4.Afficher armee");
+        System.out.println("5.Lancer l'attaque");
+        System.out.println("6.se defendre");
 //        System.out.println("5.retouner au menu principal");
         System.out.println("----------------------------------");
         System.out.println("Veillez choisir une option.");
-        System.out.println(String.format("ARGENT: %d", argent));
+        System.out.printf("ARGENT: %d%n", argent);
     }
 
+    public void calculScore(ArrayList<Unite> ennemisMort,ArrayList<Unite> armeeMort){
+        for(Unite EM : ennemisMort){
+            if(EM instanceof EnemyBase){
+                score+=150;
+            }else if(EM instanceof EnemyIntermedier){
+                score+=300;
+            }else if(EM instanceof EnemyBoss){
+                score+=500;
+            }
+        }
+        for(Unite AM : armeeMort){
+            if(AM instanceof Soldat){
+               score= Math.max(score-90,0);
+            }else if(AM instanceof Archer){
+                score= Math.max(score-100,0);
+            }else if(AM instanceof Cavalier){
+                score= Math.max(score-125,0);
+            }
+        }
+    }
+    public int meilleurScore(int currentScore){
+        return Math.max(score,currentScore);
+    }
 
 
 }

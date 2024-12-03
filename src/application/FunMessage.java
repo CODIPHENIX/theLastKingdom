@@ -27,6 +27,7 @@ public class FunMessage {
             default -> throw new IllegalStateException("Unexpected value: " + aleatoire);
         };
     }
+
     public static String enemyTuer(){
         int aleatoire = random.nextInt(5);
        return switch (aleatoire){
@@ -38,6 +39,7 @@ public class FunMessage {
            default -> throw new IllegalStateException("Unexpected value: " + aleatoire);
         };
     }
+
     public static String victoire(){
         int aleatoire = random.nextInt(6);
         return switch (aleatoire){
